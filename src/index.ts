@@ -1,12 +1,9 @@
 
-import http from 'http';
-import { app } from './app.ts';
+import app from './app.ts';
+import { Serverboostrap } from './server/server-boostrap.ts';
 
-const server = http.createServer(app);
-const PORT = process.env || 4000;
+const server = new Serverboostrap (app);
+server.init();
 
-server.listen(4000, () =>{
-    console.log('servidor iniciado en http://localhost:4000')
-})
 
 
