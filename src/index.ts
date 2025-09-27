@@ -1,9 +1,16 @@
-
+import "./infraestructure/config/enviroment.ts"
 import app from './app.ts';
-import { Serverboostrap } from './server/server-boostrap.ts';
+import Serverboostrap from './server/server-boostrap.ts';
 
 const server = new Serverboostrap (app);
-server.init();
-
-
+(
+    async () => {
+    try {
+        const intancies =[server.init()];
+        await Promise.all(intancies);
+    } catch (error){
+        console.error(error);
+    }
+}
+)();
 

@@ -1,17 +1,26 @@
-import http from 'http';
-import  Express  from 'express';
+import getPort from 'get-port';
 
-export class Serverboostrap {
-    private app!: Express.Application;
-    constructor(app:Express.Application){
+export default class Serverboostrap {
+    private app: any;
+    constructor(app: any) {
         this.app = app;
     }
-    init(){
-        const server = http.createServer(this.app);
-        const PORT = process.env.PORT || 4000;
 
-        server.listen(PORT, ()=> {
-            console.log ('servidor inicializado en http://localhost:${PORT}');
+    async init(): Promise<boolean> {
+        return new Promise( async(resolve, reject) => {
+
+        const PORT = await getPort({ port: [4000, 4999] });
+        this.app.listen(PORT)
+        .on("listening", () => {
+            console.log(`Servidor en puerto ${PORT}`);
+            console.log(`Servidor en http://localhost:${PORT}`);
+            resolve(true);
+        })
+        .on("error",(err: Error)=>{
+            console.error(`error al iniciar el servidor ${err}`)
+            reject(false)
         });
-    }
-}
+
+    });
+         }}
+    

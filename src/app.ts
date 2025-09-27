@@ -1,19 +1,22 @@
-import express, { response } from "express";
+import express from "express";
 import type  { Request, Response }  from "express";
+
 
  class App{
     private app: express.Application;
     constructor(){
         this.app = express();
+        this.routes();
     }
 
     private routes():void{
     this.app.get ('/', (req: Request, res: Response)=> { 
-    res.send("Hola mundo")
- })
+    res.send("servidor iniciado, one page")
+ });
 
-    this.app.get("/check", (req:Request, res:Response)=>{
-    res.send("check")
+    this.app.get("/usuarios",(req:Request, res:Response)=>{
+    res.send ("/usuarios")
+
 })
     this.app.get("/test", (req:Request, res:Response)=>{
     res.send("test")
