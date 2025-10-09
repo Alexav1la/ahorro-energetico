@@ -1,9 +1,9 @@
 import { Repository } from "typeorm";
 import type { User as UserDomain } from "../../domian/User.ts";
-import { User as UserEntity } from "../entities/User.ts";
+import { User, UserEntity } from "../entities/User.ts";
 import type { UserPort } from "../../domian/UserPort.ts";
-import { AppDataSource } from "../database/DataSource";
-import { User } from '../../domian/User';
+import { AppDataSource } from "../config/database.ts";
+//import { User } from '../../domian/User.js';
 
 
 export class UserAdapter implements UserPort {

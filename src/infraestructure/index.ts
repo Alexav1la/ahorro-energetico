@@ -1,6 +1,6 @@
-import "./infraestructure/config/enviroment.ts"
-import app from './app.ts';
-import Serverboostrap from './server/server-boostrap.ts';
+import "./config/enviroment.ts"
+import app from './web/app.ts';
+import Serverboostrap from '../server/server-boostrap.ts';
 
 const server = new Serverboostrap (app);
 (

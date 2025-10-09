@@ -24,7 +24,7 @@ export class UserAplicationService {
     async getAllUsers(): Promise<User[]> {
         return await this.port.getallUsers();
     }
-    async updateUser({ id, user }: { id: number; user: Partial<User>; }): Promise<boolean> {
+    async updateUser(id: number, p0: { name: any; email: any; password: any; status: any; }, { id, user }: { id: number; user: Partial<User>; }): Promise<boolean> {
         // Validar si el usuario existe
         const existingUser = await this.port.getUserById(id);
         if (!existingUser) {
