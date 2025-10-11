@@ -9,6 +9,8 @@ import userRouter from "../routes/UserRouters.ts";
 
     constructor(){
         this.app = express();
+        this.middlewares();
+        // Iniciador de rutas
         this.routes();
     }
 
