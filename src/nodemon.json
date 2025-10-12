@@ -3,7 +3,7 @@
     "ext": "ts json",
     "ignore": ["src/**/.spec.ts", "node_module"],
     "execMap":{
-        "ts": "ts-node"
+        "ts": "ts-node src/index.ts"
     },
     "verbose": true,
     "restartable": "rs"
