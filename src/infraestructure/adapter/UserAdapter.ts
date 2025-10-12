@@ -1,9 +1,8 @@
 import { Repository } from "typeorm";
 import type { User as UserDomain } from "../../domian/User.ts";
-import { User, UserEntity } from "../entities/User.ts";
+import type { UserEntity } from "../entities/User.ts";
 import type { UserPort } from "../../domian/UserPort.ts";
 import { AppDataSource } from "../config/database.ts";
-//import { User } from '../../domian/User.js';
 
 
 export class UserAdapter implements UserPort {
@@ -42,7 +41,7 @@ export class UserAdapter implements UserPort {
     }
     async getUserById(id: number): Promise<UserDomain | null> {
         try {
-            const user = await this.userRepository.findOne({where:{id_user: id}});
+            const user = await this.userRepository.findOne({where:{id: id}});
             return user ? this.toDomain(user) : null;
         } catch (error) {
             console.error("Error al obtener usuario por ID:", error);
@@ -51,7 +50,7 @@ export class UserAdapter implements UserPort {
     }
     async getUserByEmail(email: string): Promise<UserDomain | null> {
         try {
-            const user = await this.userRepository.findOne({where:{email_user: email}});
+            const user = await this.userRepository.findOne({where:{email: email}});
             return user ? this.toDomain(user) : null;
         } catch (error) {
             console.error("Error al obtener usuario por email:", error);
@@ -60,7 +59,7 @@ export class UserAdapter implements UserPort {
     }   
     async updateUser(id: number, user: Partial<UserDomain>): Promise<boolean> {
         try {
-            const existingUser = await this.userRepository.findOne({where:{id_user: id}});
+            const existingUser = await this.userRepository.findOne({where:{id: id}});
             if (!existingUser) {
                 throw new Error("Usuario no encontrado");
             }
@@ -80,11 +79,12 @@ export class UserAdapter implements UserPort {
     }
     async deleteUser(id: number): Promise<boolean> {
         try {
-            const existingUser = await this.userRepository.findOne({where:{id_user: id}});
+            const existingUser = await this.userRepository.findOne({where:{id: id}});
             if (!existingUser) {
                 throw new Error("Usuario no encontrado");
             }
-            Object.assign(existingUser {
+            Object
+            .assign(existingUser ,{
                 status_user: 0
             });
             await this.userRepository.save(existingUser);

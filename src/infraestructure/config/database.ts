@@ -1,6 +1,6 @@
-import { DataSource } from "typeorm";
+import { database } from "./database.ts";
 
-export const AppDataSource = new DataSource({
+export const AppDataSource = new database({
   type: "postgres",
   host: "localhost",
   port: 5432,
@@ -10,3 +10,9 @@ export const AppDataSource = new DataSource({
   entities: [UserEntity],
   synchronize: true,
 });
+
+
+
+
+export { database };
+

@@ -2,7 +2,7 @@
 
 import express, { type Request, type Response } from "express";
 import userRouter from "../routes/UserRouters.ts"; 
-
+import energyRouter from "../routes/EnergyRouters.ts";
 
  class App{
     private app: express.Application;
@@ -20,7 +20,8 @@ import userRouter from "../routes/UserRouters.ts";
 
     private routes():void{
         this.app.use("/api", userRouter);
-    }
+        this.app.use("/api", energyRouter);
+     }
 
 
     getApp(){

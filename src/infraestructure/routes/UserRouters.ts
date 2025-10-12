@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserAdapter } from "../adapter/UserAdapter.ts";
 import { UserAplicationService } from "../../application/UserApplicationService.ts";
-import { UserController } from "../controller/UserCantroller.ts";
+import { UserController } from "../controller/UserController.ts";
 
 
 const router = Router();
