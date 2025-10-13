@@ -1,5 +1,5 @@
-import { ApartamentPort } from "./domain/ApartamentPort.ts";
-import { Apartament } from "./domain/Apartament.ts";
+import { ApartamentPort } from "../domain/ApartamentPort.ts";
+import { Apartament } from "../domain/Apartament.ts";
 
 export class ApartamentApplicationService {
     private port: ApartamentPort;
