@@ -1,4 +1,4 @@
-import { ConsumoEnergia } from "./consumo_energia";
+import { ConsumoEnergia } from "./ConsumoEnergia";
 
 export interface ConsumoEnergiaPort{
     createConsumo(consumo: Omit<ConsumoEnergia, "id">): Promise <number>;

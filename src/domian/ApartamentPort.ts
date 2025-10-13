@@ -1,4 +1,4 @@
-import { apartament } from "./apartament";
+import { apartament } from "./Apartament";
 
 export interface apartamentPort {
     createApartament(apartament: Omit <apartament, "id">): Promise <number>;

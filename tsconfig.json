@@ -50,6 +50,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["src/**/*", "src/index.ts"],
+  "include": ["src/**/*", "src/index.ts", "src/server", "index.ts"],
   "exclude": ["node_module", "dist"]
 }
