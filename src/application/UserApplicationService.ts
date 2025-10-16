@@ -1,11 +1,9 @@
 import { UserPort } from "../domain/UserPort";
 import { User } from "../domain/User";
-import { promises } from "dns";
 
 
 export class UserApplicationService{
-    private port: UserPort;
-
+    private port: UserPort
     constructor( port: UserPort){
         this.port = port
     }
@@ -16,6 +14,9 @@ export class UserApplicationService{
          }
          throw new Error ("usuario con email existinte");
          
+    }
+    async getUserByEmail (email: string): Promise <User | null> {
+        return await this.port.getUserByEmail(email);
     }
     async getUserById (id: number): Promise <User | null> {
         return await this.port.getUserById (id);

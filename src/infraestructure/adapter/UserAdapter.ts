@@ -59,11 +59,41 @@ export class UserAdapter implements UserPort {
 
         }
     }
-    updateUser(id: number, user: Partial<UserDomain>): Promise<boolean> {
-        throw new Error("Method not implemented.");
+   async updateUser(id: number, user: Partial<UserDomain>): Promise<boolean> {
+    try{
+        const existingUser = await this.userRepository.findOne({where: {id_user:id}});
+        if(!existingUser){
+            throw new Error("User not found");
+        }
+        Object.assign(existingUser,{
+            name_user: user.name?? existingUser.name_user,
+            email_user: user.email?? existingUser.emai_user,
+            password_user : user.password ?? existingUser.password_user,
+            status_user:1
+        });
+        await this.userRepository.save(existingUser);
+        return true;
+    } catch(error) {
+        console.error("Error updating user:", error);
+        throw new Error("Error updating user");
     }
-    deleteUser(id: number): Promise<boolean> {
-        throw new Error("Method not implemented.");
+        
+    }
+   async  deleteUser(id: number): Promise<boolean> {
+        try{
+            const existingUser= await this.userRepository.findOne({ where: {id_user:id}});
+            if(!existingUser){
+                throw new Error ("user no found");
+            }
+            Object.assign(existingUser, {
+                status_user: 0
+            });
+            await this.userRepository.save(existingUser);
+        return true;
+    } catch(error) {
+        console.error("Error deleting user:", error);
+        throw new Error("Error deleting user");
+        }
     }
     async getAllUser(): Promise<UserDomain[]> {
         try{
