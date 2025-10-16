@@ -1,4 +1,4 @@
-import { SolicitudServicio } from "./SolicitudServicio";
+import { SolicitudServicio } from ".";
 
 export interface SolicitudServicioPort{
     createSolicitudServicio(request: Omit<SolicitudServicio, "id" | "create_at" | "update_at">): Promise <number>;
