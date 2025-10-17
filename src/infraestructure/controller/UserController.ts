@@ -1,8 +1,8 @@
 import type { UserApplicationService } from "../../application/UserApplicationService.ts";
 import type { Request, Response } from "express";
 import type { User } from "../../domain/User.ts";
-import type { error } from "console";
-import { getDefaultResultOrder } from "dns";
+
+
 
 export class UserController {
     private app: UserApplicationService;
@@ -13,7 +13,7 @@ export class UserController {
 
     async createUser(req: Request, res: Response) {
         // Lógica para manejar la creación de un usuario
-        const { name, email, password, status } = req.body;
+        const { name, email, password } = req.body;
         try {
             //validaciones con regexserId
             const nameRegex = /^[a-zA-Z\zAñ]+$/;
@@ -91,7 +91,7 @@ export class UserController {
 
     async getAllUsers(req: Request, res: Response) {
         try {
-            const users = await this.app.getAllUser();
+            const users = await this.app.getAllUsers();
             return res.status(200).json(users);
         } catch (error) {
             if (error instanceof Error) {
@@ -159,9 +159,9 @@ export class UserController {
             const updated = await this.app.updateUser(
                 id,
                 { name, email, password, status },
-                { id, user: { name, email, password, status} }
+                { id, user: { name, email, password, status } }
             );
-            if (!updated) {
+            if (updated) {
                 return res
                     .status(404)
                     .json({ message: "Usuario no encontrado o sin cambios" });
