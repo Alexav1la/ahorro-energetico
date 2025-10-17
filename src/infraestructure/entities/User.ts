@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -17,14 +16,4 @@ export class User {
 
     @Column ({ type: "int"})
     status_user!: string;
-=======
-
-export interface UserEntity {
-    id: number;
-    email: string;
-    name: string;
-    password: string;
-    status: number;
-    status_user: number;
->>>>>>> main1
 }

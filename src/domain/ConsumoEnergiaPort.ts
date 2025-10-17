@@ -9,5 +9,5 @@ export interface ConsumoEnergiaPort{
     getAllconsumo(): Promise <ConsumoEnergia []>;
     updateconsumo(id: number, consumo: Partial <ConsumoEnergia>): Promise<boolean>;
     deleteconsumo (id: number): Promise <boolean>;
-    getavegaeconsumo (apartament_id: number, month: number): Promise <number>;
+    getavegareconsumo (apartament_id: number, month: number): Promise <number>;
 }

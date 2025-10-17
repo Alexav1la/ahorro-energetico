@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { EnergyAdapter } from "../adapter/EnergyAdapter.ts";
 import { EnergyApplicationService } from "../../application/EnergyApplicationService.ts";
-import { EnergyController } from "../controller/EnergyController.ts";
+import { EnergyController } from "../controller/EnergyController";
 
 // Instancia del servicio y controlador
 

@@ -9,7 +9,7 @@ export class ApartamentApplicationService {
     }
 
     async createApartament(apartament: Omit<apartament, "id">): Promise<number> {
-        const existingApartament = await this.port.getapartamentByname(apartament.apartament_number);
+        const existingApartament = await this.port.getApartamentByNumber(apartament.apartament_number);
         if (!existingApartament) {
             return await this.port.createApartament(apartament);
         }

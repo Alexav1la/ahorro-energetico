@@ -1,4 +1,4 @@
-import { number } from "joi";
+
 
 export interface ConsumoEnergia{
     id: Number;
