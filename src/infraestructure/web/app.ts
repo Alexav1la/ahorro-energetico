@@ -3,6 +3,7 @@
 import express, { type Request, type Response } from "express";
 import userRouter from "../routes/UserRouters.ts"; 
 import energyRouter from "../routes/EnergyRouters.ts";
+import ApartamentRouter from "../routes/ApartamentRoutes.ts";
 
  class App{
     private app: express.Application;
@@ -20,9 +21,9 @@ import energyRouter from "../routes/EnergyRouters.ts";
 
     private routes():void{
         this.app.use("/api", userRouter);
+        this.app.use("/api", ApartamentRouter);
         this.app.use("/api", energyRouter);
      }
-
 
     getApp(){
         return this.app;

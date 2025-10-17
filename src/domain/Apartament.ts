@@ -1,4 +1,4 @@
-export interface apartament{
+export interface Apartament{
     id: number;
     apartament_number: string;
     torre: string;

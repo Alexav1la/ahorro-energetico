@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ApartamentApplicationService } from "../../application/ApartamentsApplicationService";
-import { count } from "console";
+import { string } from "joi";
+
 
 export class ApartamentController {
      constructor (private apartamentService: ApartamentApplicationService){}
@@ -41,6 +42,23 @@ export class ApartamentController {
             res.status(200).json(apartament);
         } catch (error: any) {
         res.status(500).json({ error: error.message || "Error al obtener el apartamento |" });
+        }
+    }
+    async getApartmentsByUserId(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = parseInt(req.params.userId ?? "");
+            if (isNaN(userId)) {
+                res.status(400).json({ error: "User ID inválido" });
+                return;
+            }
+
+            const apartments = await this.apartamentService.getApartmentsByUserId(userId);
+            res.status(200).json({
+                count: apartments.length,
+                apartments
+            });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al obtener apartamentos" });
         }
     }
 

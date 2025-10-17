@@ -1,282 +1,175 @@
-import { ConsumoEnergia } from '../../domain/ConsumoEnergia';
-import type { ConsumoEnergiaApplicationService } from '../../application/ConsumoEnergiaApplicationService';
-import { Request, Response } from 'express';
-import { error } from 'console';
-
-
-
+import { Request, Response } from "express";
+import { ConsumoEnergiaService } from "../../application/ConsumoEnergiaService";
+import { apartament } from "../entities/apartament";
+import { parse } from "path";
 
 
 export class ConsumoEnergiaController {
-    private app: ConsumoEnergiaApplicationService;
+    constructor (private energyService: ConsumoEnergiaService){}
 
-    constructor(app: ConsumoEnergiaApplicationService) {
-        this.app = app;
-    }
+    async CreateConsumo( req: Request , res: Response): Promise<void>{
+        try{
+            const { apartament_id, consumo_kwh, costo, fecha_lectura, mes_facturacion, lectura_medidor, notas } = req.body;
 
-    async createConsumoEnergia(req: Request, res: Response) {
-        const { apartament_id, consumo_kwh, cost, fecha_lectura, mes_facturacion, consumo_mensual, notas } = req.body;
-        try {
-            // Validar con regex
-            const ConsumoEnergiaRegex = /^[a-zA-Z0-9\s.,'-]*$/;
-            if (!ConsumoEnergiaRegex.test(apartament_id.trim())) {
-                return res
-                .status(400)
-                .json({ message: "ID de apartamento contiene caracteres inválidos" });
+            if (!apartament_id || !consumo_kwh || !costo || !fecha_lectura || !mes_facturacion || !lectura_medidor) {
+                res.status(400).json({ error: "Todos los campos son obligatorios" });
+                return;
             }
-
-            if(!/^\d+$/.test(consumo_kwh)){
-                return res
-                .status(400)
-                .json({ message: "Consumo kWh debe ser un número válido" });
-            }
-
-            if(!/^\d+(\.\d{1,2})?$/.test(cost)){
-                return res
-                .status(400)
-                .json({ message: "Costo debe ser un número válido con hasta dos decimales" });
-            }
-
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha_lectura)) {
-                return res
-                .status(400)
-                .json({ message: "Fecha de lectura debe tener el formato YYYY-MM-DD" });
-            }
-
-            if (!/^\d{4}-\d{2}$/.test(mes_facturacion)) {
-                return res
-                .status(400)
-                .json({ message: "Mes de facturación debe tener el formato YYYY-MM" });
-            }
-
-            if(!/^\d+$/.test(consumo_mensual)){
-                return res
-                .status(400)
-                .json({ message: "Consumo mensual debe ser un número válido" });
-            }
-
-            if (notas && !ConsumoEnergiaRegex.test(notas.trim())) {
-                return res
-                .status(400)
-                .json({ message: "Notas contiene caracteres inválidos" });
-            }
-
-            const newConsumoEnergia: Omit<ConsumoEnergia, 'id'> = {
-                apartament_id,
-                consumo_kwh,
-                cost,
-                fecha_lectura,
-                mes_facturacion,
-                consumo_mensual,
-                notas
-            };
-            const ConsumoEnergia = await this.app.createConsumoEnergia(newConsumoEnergia);
-            return res.status(201).json({ id: ConsumoEnergia, message: 'Consumo de energía creado exitosamente' });
-            
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
-            }
-            return res.status(500).json({ error: "error en el servidor" });
+        
+        const Consumo_Id = await this.energyService.createConsumoEnergia({
+            apartament_id : parseInt(apartament_id),
+            consumo_kwh: parseFloat(consumo_kwh),
+            costo: parseFloat(costo),
+            fecha_lectura: new Date(fecha_lectura),
+            mes_facturacion,
+            lectura_medidor: parseFloat(lectura_medidor),
+            notas
+        });
+        res.status(201).json({
+            message: "Consumo de Energía creado correctamente",
+            Consumo_Id
+        });
+        } catch (error: any) {
+            res.status(400).json({ error: error.message || "Error al crear el consumo de energía" });
         }
     }
 
-    async getConsumoEnergiaById(req: Request, res: Response) {
+    async getConsumoEnergiaById(req: Request, res: Response): Promise<void>{
         try {
             const id = parseInt(req.params.id ?? "");
-            if (isNaN(id)) 
-                return res.status(400).json({ message: "el id debe ser un número" });
-            const consumoEnergia = await this.app.getConsumoEnergiaById(id);
-            if(!consumoEnergia) return res.status(404).json({ message: "Consumo de energía no encontrado" });
-            return res.status(200).json(consumoEnergia);
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
+            if (isNaN(id)) {
+                res.status(400).json({ error: "ID inválido" });
+                return;
             }
-            return res.status(500).json({ error: "error en el servidor" });
-        }
-    }
-
-    async getConsumoEnergiaByApartamentId(req: Request, res: Response) {
-        try {
-            const apartament_id = req.params.apartament_id;
-            if (!apartament_id || !/^[a-zA-Z0-9\s.,'-]*$/.test(apartament_id.trim())) 
-                return res
-                .status(400)
-                .json({ message: "ID de apartamento contiene caracteres inválidos" });
-                // Validar que el apartamento exista
-            const consumoEnergia = await this.app.getConsumoEnergiaByApartamentId(apartament_id);
-            if (!Array.isArray(consumoEnergia) || consumoEnergia.length === 0) {
-                return res.status(404).json({ message: "No se encontraron consumos de energía para este apartamento" });
-            }
-            return res.status(200).json(consumoEnergia);
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
-            }
-            return res.status(500).json({ error: "error en el servidor" });
-        }
-    }
-
-    async getByApartamentIdAndMonth(req: Request, res: Response): Promise<Response> {
-        try {
-            const apartament_id = req.params.apartament_id;
-            const month = req.params.month;
-            if (!apartament_id) 
-                return res
-                .status(400)
-                .json({ message: "ID de apartamento es requerido" });
-
-            const apartamentIdNum = parseInt(apartament_id ?? "");
-            if (isNaN(apartamentIdNum)) 
-                return res
-                .status(400)
-                .json({ message: "ID de apartamento debe ser un número" });
-
-            if (!month || !/^\d{4}-\d{2}$/.test(month)) {
-                return res
-                .status(400)
-                .json({ message: "Mes debe tener el formato YYYY-MM" });
-            }
-            const consumoEnergia = await this.app.getByApartamentIdAndMonth(apartamentIdNum, month);
+            const consumoEnergia = await this.energyService.getConsumoEnergiaById(id);
             if (!consumoEnergia) {
-                return res.status(404).json({ message: "No se encontró consumo de energía para este apartamento en el mes especificado" });
+                res.status(404).json({ error: "Consumo de Energía no encontrado" });
+                return;
             }
-            return res.status(200).json(consumoEnergia);
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
-            }
-            return res.status(500).json({ error: "error en el servidor" });
+            res.status(200).json(consumoEnergia);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al obtener el consumo de energía" });
         }
     }
 
-    async getAllConsumoEnergias(req: Request, res: Response): Promise<Response> {
+    async getConsumoByApartamentId(req: Request, res: Response): Promise<void>{
         try {
-            const consumoEnergias = await this.app.getAllConsumoEnergia();
-            if(consumoEnergias.length === 0) return res.status(404).json({ message: "No se encontraron consumos de energía" });
-            return res.status(200).json(consumoEnergias);
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
+            const apartament_id = parseInt(req.params.id ?? "");
+            if (isNaN(apartament_id)) {
+                res.status(400).json({ error: "ID inválido" });
+                return;
             }
-            return res.status(500).json({ error: "error en el servidor" });
+            const consumoEnergia = await this.energyService.getConsumoByApartamentId(apartament_id);
+            if (!consumoEnergia) {
+                res.status(404).json({ error: "Consumo de Energía no encontrado" });
+                return;
+            }
+            res.status(200).json(consumoEnergia);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al obtener el consumo de energía" });
         }
     }
 
-    async deleteConsumoEnergia(req: Request, res: Response): Promise<Response> {
+    async getConsumoEnergiaMes (req: Request, res : Response): Promise <void>{
+      try {
+        const apartament_id = parseInt(req.params.apartament_id ?? "");
+        const {month} = req.query
+
+        if(isNaN(apartament_id)) {
+            res.status(400).json({ error: " apartamento o mes invalido" });
+            return;
+    }
+        const consumo = await this.energyService.getConsumoByMes(apartament_id, month as string);
+        res.status(200).json({
+            count: consumo.length,
+            consumo
+            });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al obtener el consumo de energía del mes" });
+        }
+    }
+
+    async getAverageconsumo (req: Request, res: Response ): Promise <void>{
+        try {
+            const apartament_id = parseInt(req.params.apartament_id ?? "");
+            const months = parseInt(req.params.month ?? "");
+
+            if (isNaN(apartament_id)) {
+                res.status(400).json({ error: " ID apartamento invalido"});
+            return;
+           
+            }
+            
+            const average = await this.energyService.getAverageConsumo(apartament_id, months);
+            res.status(200).json({
+                apartmentid: apartament_id,
+                months,
+                average_kwh: average
+            });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al calcular promedio" });
+        }
+    }
+
+    async getAllConsumo(req: Request, res: Response): Promise<void> {
+        try {
+            const Consumo = await this.energyService.getAllConsumo();
+            res.status(200).json({
+                count: Consumo.length,
+                Consumo
+            });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message || "Error al obtener consumos" });
+        }
+    }
+
+    async updateConsumption(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id ?? "");
-            if (isNaN(id)) 
-                return res
-            .status(400)
-            .json({ error: "el id debe ser un número" });
+            const { Consumo_kwh, costo, fecha_lectura, mes_facturacion, lectura_medidor, notas } = req.body;
 
-            const deleted = await this.app.deleteConsumoEnergia(id);
-            if (!deleted) 
-                return res
-            .status(404)
-            .json({ message: "Consumo de energía no encontrado" });
-            return res.status(200).json({ message: "Consumo de energía eliminado" });
-
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
-            }
-            return res.status(500).json({ error: "error en el servidor" });
-        }
-    }
-
-    async updateConsumoEnergia(req: Request, res: Response): Promise<Response> {
-        try {
-            const id = parseInt(req.params.id ?? "");
-            if (isNaN(id)) 
-                return res
-            .status(400)
-            .json({ error: "el id debe ser un número" });
-
-            const { apartament_id, consumo_kwh, cost, fecha_lectura, mes_facturacion, consumo_mensual, notas } = req.body;
-
-            // Validar antes de actualizar
-            if (apartament_id && !/^[a-zA-Z0-9\s.,'-]*$/.test(apartament_id.trim())) {
-                return res
-                .status(400)
-                .json({ message: "ID de apartamento contiene caracteres inválidos" });
+            if (isNaN(id)) {
+                res.status(400).json({ error: "ID inválido" });
+                return;
             }
 
-            if (consumo_kwh && !/^\d+$/.test(consumo_kwh)) {
-                return res
-                .status(400)
-                .json({ message: "Consumo kWh debe ser un número válido" });
-            }
-
-            if (cost && !/^\d+(\.\d{1,2})?$/.test(cost)) {
-                return res
-                .status(400)
-                .json({ message: "Costo debe ser un número válido con hasta dos decimales" });
-            }
-
-            if (fecha_lectura && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_lectura)) {
-                return res
-                .status(400)
-                .json({ message: "Fecha de lectura debe tener el formato YYYY-MM-DD" });
-            }
-
-            if (mes_facturacion && !/^\d{4}-\d{2}$/.test(mes_facturacion)) {
-                return res
-                .status(400)
-                .json({ message: "Mes de facturación debe tener el formato YYYY-MM" });
-            }
-
-            if (consumo_mensual && !/^\d+$/.test(consumo_mensual)) {
-                return res
-                .status(400)
-                .json({ message: "Consumo mensual debe ser un número válido" });
-            }
-
-            if (notas && !/^[a-zA-Z0-9\s.,'-]*$/.test(notas.trim())) {
-                return res
-                .status(400)
-                .json({ message: "Notas contiene caracteres inválidos" });
-            }
-
-            const updatedConsumo: Partial<ConsumoEnergia> = {
-                apartament_id,
-                consumo_kwh,
-                cost,
-                fecha_lectura,
+            const updated = await this.energyService.updateConsumo(id, {
+                consumo_kwh: Consumo_kwh ? parseFloat(Consumo_kwh) : undefined,
+                costo: costo ? parseFloat(costo) : undefined,
+                fecha_lectura: fecha_lectura ? new Date(fecha_lectura) : undefined,
                 mes_facturacion,
-                consumo_mensual,
+                lectura_medidor: lectura_medidor ? parseFloat(lectura_medidor) : undefined,
                 notas
-            };
+            });
 
-            const updated = await this.app.updateConsumoEnergia(id, updatedConsumo);
-            if (!updated) 
-                return res
-            .status(404)
-            .json({ message: "Consumo de energía no encontrado" });
-            return res.status(200).json({ message: "Consumo de energía actualizado" });
-
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500)
-                .json({ error: "error en el servidor",
-                    details: error.message });
+            if (!updated) {
+                res.status(404).json({ error: "Consumo no encontrado" });
+                return;
             }
-            return res.status(500).json({ error: "error en el servidor" });
+
+            res.status(200).json({ message: "Consumo actualizado exitosamente" });
+        } catch (error: any) {
+            res.status(400).json({ error: error.message || "Error al actualizar consumo" });
         }
     }
-}
 
+    async deleteConsumo(req: Request, res: Response): Promise<void> {
+        try {
+            const id = parseInt(req.params.id ?? "");
+            if (isNaN(id)) {
+                res.status(400).json({ error: "ID inválido" });
+                return;
+            }
+
+            const deleted = await this.energyService.deleteconsumo(id);
+            if (!deleted) {
+                res.status(404).json({ error: "Consumo no encontrado" });
+                return;
+            }
+
+            res.status(200).json({ message: "Consumo eliminado exitosamente" });
+        } catch (error: any) {
+            res.status(400).json({ error: error.message || "Error al eliminar consumo" });
+        }
+    }
+  }

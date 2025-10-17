@@ -1,6 +1,10 @@
 import { DataSource } from "typeorm";
 import { User} from "../entities/User.ts"
 import dotenv from "dotenv";
+import { apartament } from "../entities/apartament.ts";
+import { ConsumoEnergia } from "../entities/consumo_energia.ts";
+import { Recomendaciones } from "../entities/recomendaciones.ts";
+import { SolicitudServicio } from "../entities/solicitudServicio.ts";
 
 
 dotenv.config();
@@ -13,7 +17,7 @@ export const AppDataSourcet = new DataSource({
     database: process.env.DB_NAME, 
     synchronize: true,
     logging: true,
-    entities: [User],
+    entities: [User, apartament, ConsumoEnergia, Recomendaciones, SolicitudServicio],
     schema: "ahorro_energetico"
 });
 

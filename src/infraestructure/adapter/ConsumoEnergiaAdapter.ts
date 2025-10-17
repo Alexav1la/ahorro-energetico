@@ -4,11 +4,31 @@ import { ConsumoEnergiaPort } from "../../domain/ConsumoEnergiaPort";
 import { ConsumoEnergia as EnergiaEntity } from "../entities/consumo_energia";
 import { AppDataSourcet } from "../config/Data-base";
 
-export class EnergyConsumptionAdapter implements ConsumoEnergiaPort {
+export class ConsumoEnergiaAdapater implements ConsumoEnergiaPort {
     private energyRepository: Repository<EnergiaEntity>;
 
     constructor() {
         this.energyRepository = AppDataSourcet.getRepository(EnergiaEntity);
+    }
+    async getaverageconsumo(apartament_id: number, month: number): Promise<number> {
+         try {
+            const consumptions = await this.energyRepository
+                .createQueryBuilder("consumption")
+                .where("consumption.apartment_id = :apartmentId", { apartament_id })
+                .orderBy("consumption.reading_date", "DESC")
+                .limit(month)
+                .getMany();
+
+            if (consumptions.length === 0) {
+                return 0;
+            }
+
+            const total = consumptions.reduce((sum, c) => sum + parseFloat(c.consumo_kwh.toString()), 0);
+            return total / consumptions.length;
+        } catch (error) {
+            console.error("Error al calcular promedio de consumo", error);
+            throw new Error("Error al calcular promedio de consumo");
+        }
     }
    async createConsumo(consumo: Omit<EnergiaDomain, "id">): Promise<number> {
         try {
@@ -95,7 +115,7 @@ export class EnergyConsumptionAdapter implements ConsumoEnergiaPort {
             }
 
             if (consumo.consumo_kwh) existingConsumption.consumo_kwh = consumo.consumo_kwh;
-            if (consumo.cost) existingConsumption.cost = consumo.cost;
+            if (consumo.costo) existingConsumption.cost= consumo.costo;
             if (consumo.fecha_lectura) existingConsumption.fecha_lectura = consumo.fecha_lectura;
             if (consumo.mes_facturacion) existingConsumption.mes_facturacion = consumo.mes_facturacion;
             if (consumo.lectura_medidor) existingConsumption.lectura_medidor = consumo.lectura_medidor;
@@ -130,33 +150,13 @@ export class EnergyConsumptionAdapter implements ConsumoEnergiaPort {
         throw new Error("Error deleting apartment");
     }
     }
-   async   getavegareconsumo(apartament_id: number, month: number): Promise<number> {
-        try {
-            const consumptions = await this.energyRepository
-                .createQueryBuilder("consumption")
-                .where("consumption.apartment_id = :apartmentId", { apartament_id })
-                .orderBy("consumption.reading_date", "DESC")
-                .limit(month)
-                .getMany();
-
-            if (consumptions.length === 0) {
-                return 0;
-            }
-
-            const total = consumptions.reduce((sum, c) => sum + parseFloat(c.consumo_kwh.toString()), 0);
-            return total / consumptions.length;
-        } catch (error) {
-            console.error("Error al calcular promedio de consumo", error);
-            throw new Error("Error al calcular promedio de consumo");
-        }
-    }
 
     private toDomain(energy: EnergiaEntity): EnergiaDomain {
         return {
             id: energy.id_consumo,
             apartament_id: energy.apartament_id,
             consumo_kwh: parseFloat(energy.consumo_kwh.toString()),
-            cost: parseFloat(energy.cost.toString()),
+            costo: parseFloat(energy.cost.toString()),
             fecha_lectura: energy.fecha_lectura,
             mes_facturacion: energy.mes_facturacion,
             lectura_medidor: parseFloat(energy.lectura_medidor.toString()),
@@ -168,7 +168,7 @@ export class EnergyConsumptionAdapter implements ConsumoEnergiaPort {
         const energyEntity = new EnergiaEntity();
         energyEntity.apartament_id = energy.apartament_id;
         energyEntity.consumo_kwh = energy.consumo_kwh;
-        energyEntity.cost = energy.cost;
+        energyEntity.cost = energy.costo;
         energyEntity.fecha_lectura = energy.fecha_lectura;
         energyEntity.mes_facturacion = energy.mes_facturacion;
         energyEntity.lectura_medidor = energy.lectura_medidor;

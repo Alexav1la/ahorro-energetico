@@ -2,13 +2,13 @@ import { Repository } from "typeorm";
 import type { User as UserDomain } from "../../domain/User.ts";
 import type { UserPort } from "../../domain/UserPort.ts";
 import { User as UserEntity } from "../entities/User.ts";
-import { AppDataSource } from "../config/database.ts";
+import { AppDataSourcet } from "../config/Data-base.ts";
 
 
 export class UserAdapter implements UserPort {
     private userRepository: Repository<UserEntity>;
     constructor(){
-        this.userRepository = AppDataSource.getRepository(UserEntity);
+        this.userRepository = AppDataSourcet.getRepository(UserEntity);
     }
     async getAllUser(): Promise<UserDomain[]> {
         try {

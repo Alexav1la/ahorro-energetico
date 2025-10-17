@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { apartament as ApartamentEntity} from "../entities/apartament";
 import { ApartamentPort as apartamentPort } from "../../domain/ApartamentPort";
 import { AppDataSourcet } from "../config/Data-base";
-import { apartament as ApartamentDomain } from "../../domain/Apartament";
+import { Apartament as ApartamentDomain } from "../../domain/Apartament";
 
 export class ApartmentAdapter implements apartamentPort {
     private apartmentRepository: Repository<ApartamentEntity>;

@@ -4,7 +4,7 @@ export interface ConsumoEnergia{
     id: Number;
     apartament_id: number;
     consumo_kwh: number;
-    cost: number;
+    costo: number;
     fecha_lectura: Date;
     mes_facturacion: string; // puede ser en formate date, para una mejor precision
     lectura_medidor: number;
