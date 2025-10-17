@@ -1,5 +1,5 @@
 import { ApartamentPort } from "../domain/ApartamentPort.ts";
-import { apartament } from "../domain/Apartament.ts";
+import { Apartament } from "../domain/Apartament.ts";
 
 export class ApartamentApplicationService {
     private port: ApartamentPort;
@@ -8,40 +8,41 @@ export class ApartamentApplicationService {
         this.port = port;
     }
 
-    async createApartament(apartament: Omit<apartament, "id">): Promise<number> {
-        const existingApartament = await this.port.getApartamentByNumber(apartament.apartament_number);
+    async createApartament(apartament: Omit<Apartament, "id">): Promise<number> {
+        // se hacen validaciones de negocio
+        const existingApartament = await this.port.getApartamentByNumber(String(apartament.apartament_number));
         if (!existingApartament) {
-            return await this.port.createApartament(apartament);
+            return this.port.createApartament(apartament);
         }
-        throw new Error("Apartament con este numero ya registrado");
+        throw new Error("apartamento con numero existente");
     }
-
-    async getApartamentById(id: number): Promise<apartament | null> {
+    async getApartamentById(id: number): Promise<Apartament | null> {
         return await this.port.getApartamentById(id);
     }
-
-    async getAllApartaments(): Promise<apartament[]> {
+    async getAllApartaments(): Promise<Apartament[]> {
         return await this.port.getAllApartaments();
     }
-
-    async updateApartament(id: number, apartament: Partial<apartament>): Promise<boolean> {
+    async updateApartament(id: number, apartament: Partial<Apartament>): Promise<boolean> {
+        // Validar si el apartamento existe
         const existingApartament = await this.port.getApartamentById(id);
         if (!existingApartament) {
-            throw new Error("Apartamento no encontrado");
+            throw new Error("apartamento no encontrado");
         }
         if (apartament.apartament_number) {
-            const nameTaken = await this.port.getApartamentByNumber(apartament.apartament_number);
-            if (nameTaken && nameTaken.id !== id) {
-                throw new Error("numero de apartamento ya registrado");
+            const apartamenttaken = await this.port.getApartamentByNumber(String(apartament.apartament_number));
+            if (apartamenttaken && apartamenttaken.id !== id) {
+                throw new Error("apartamento con numero existente");
             }
         }
-        return await this.port.updateApartament(id, apartament);
+        return this.port.updateApartament(id, apartament);
     }
     async deleteApartament(id: number): Promise<boolean> {
         const existingApartament = await this.port.getApartamentById(id);
         if (!existingApartament) {
-            throw new Error("Apartament no encontrado");
+            throw new Error("apartamento no encontrado");
         }
         return await this.port.deleteApartament(id);
     }
+
+
 }
